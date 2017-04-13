@@ -1,20 +1,20 @@
 package homepunk.work.geolocation.ui;
 
-import android.Manifest.permission;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,25 +25,24 @@ import homepunk.work.geolocation.model.WeatherConsolidated;
 import homepunk.work.geolocation.presenters.WeatherViewPresenter;
 import homepunk.work.geolocation.presenters.interfaces.IWeatherViewPresenter;
 import homepunk.work.geolocation.ui.interfaces.IWeatherView;
+import io.nlopez.smartlocation.location.providers.LocationManagerProvider;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static android.location.LocationManager.GPS_PROVIDER;
-import static android.location.LocationManager.NETWORK_PROVIDER;
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static io.nlopez.smartlocation.SmartLocation.Builder;
+import static io.nlopez.smartlocation.SmartLocation.LocationControl;
 
-public class WeatherActivity extends AppCompatActivity implements IWeatherView {
-    public static final int MIN_TIME = 10000;
-    public static final int MIN_DISTANCE = 0;
-    public static final int SUCCESS_REQUEST_CODE = 4;
-
-    private Location location;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private IWeatherViewPresenter weatherViewPresenter;
-
+public class WeatherActivity extends AppCompatActivity implements IWeatherView, OnMapReadyCallback {
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.fab) FloatingActionButton fab;
     @Bind(R.id.lattlng_weather_textview) TextView latLngWeatherTV;
     @Bind(R.id.lattlng_weather_icon) ImageView latLngWeatherIconIV;
+
+    private Location location;
+    private RxPermissions rxPermissions;
+    private LocationControl locationControl;
+    private SupportMapFragment mapFragment;
+    private IWeatherViewPresenter weatherPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,38 +50,35 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView {
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        weatherViewPresenter = new WeatherViewPresenter();
-        weatherViewPresenter.setView(this);
 
-        setUpLocationManager();
+        setUpUI();
     }
 
     @Override
     protected void onResume() {
+        mapFragment.onResume();
         super.onResume();
 
-        getCurrentLocation();
+        locate();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onMapReady(GoogleMap googleMap) {
+        GoogleMap map = googleMap;
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setZoomGesturesEnabled(true);
 
-        if (requestCode == SUCCESS_REQUEST_CODE && permissions.length == 2) {
-            getCurrentLocation();
-        }
+        weatherPresenter.setMap(map);
     }
 
 
     @Override
     public void onResult(Weather weather) {
         if (weather != null) {
-            WeatherConsolidated consolidatedWeather = weather.getFirstConsolidatedWeather();
-            if (consolidatedWeather != null) {
+            WeatherConsolidated weatherConsolidated = weather.getFirstConsolidatedWeather();
+            if (weatherConsolidated != null) {
                 StringBuilder sb = new StringBuilder()
-                        .append(consolidatedWeather.getApplicableDate())
-                        .append(", ")
-                        .append(consolidatedWeather.getWeatherStateName())
+                        .append(weatherConsolidated.getWeatherStateName())
                         .append(" in ")
                         .append(weather.getTitle());
 
@@ -95,67 +91,48 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView {
         }
     }
 
-
     @Override
     public void onError(String e) {
         Toast.makeText(this, e, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void showLoading() {
-
-    }
-
-    @Override
-    public void hideLoading() {
-
-    }
-
     @OnClick(R.id.fab)
     public void onClick() {
-        if (location != null) {
-            weatherViewPresenter.getWeatherByLocation(location);
+        locate();
+    }
+
+    private boolean isPermissionsGranted() {
+        return rxPermissions.isGranted(ACCESS_FINE_LOCATION) && rxPermissions.isGranted(ACCESS_COARSE_LOCATION);
+    }
+
+    private void setUpUI() {
+        weatherPresenter = new WeatherViewPresenter();
+        weatherPresenter.setView(this);
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
+        mapFragment.getMapAsync(this);
+        
+        locationControl = new Builder(this)
+                .logging(true)
+                .build()
+                .location(new LocationManagerProvider());
+        
+        rxPermissions = new RxPermissions(this);
+    }
+
+    private void locate() {
+        if (!isPermissionsGranted()) {
+            rxPermissions.request(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION);
         }
-    }
 
-    private void setUpLocationManager() {
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location != null) {
-                    WeatherActivity.this.location = location;
-                }
-            }
+        locationControl.oneFix()
+                       .start(location -> WeatherActivity.this.location = location);
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-    }
-
-    private void getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION}, SUCCESS_REQUEST_CODE);
+        if (location == null) {
+            location = locationControl.getLastLocation();
         } else {
-            location = locationManager.getLastKnownLocation(GPS_PROVIDER);
-
-            if (location == null) {
-                locationManager.requestLocationUpdates(GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
-                locationManager.requestLocationUpdates(NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
-            }
+            weatherPresenter.getWeatherByLocation(new LatLng(location.getLatitude(),
+                                                             location.getLongitude()));
         }
     }
 

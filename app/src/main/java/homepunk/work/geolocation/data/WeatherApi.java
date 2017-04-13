@@ -14,7 +14,7 @@ import static homepunk.work.geolocation.data.Constants.LOCATION_URL;
 import static homepunk.work.geolocation.data.Constants.WEATHER_URL;
 import static homepunk.work.geolocation.data.Constants.WOEID_PARAM;
 
-public interface MetaWeatherApi {
+public interface WeatherApi {
     @GET(LOCATION_URL)
     Single<List<WeatherLocation>> fetchLocation(@Query(LATLONG_PARAM) String latlng);
 

@@ -1,10 +1,11 @@
 package homepunk.work.geolocation.presenters;
 
-import android.location.Location;
-import android.util.Log;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import homepunk.work.geolocation.data.MetaWeatherRepository;
-import homepunk.work.geolocation.model.Latlng;
+import homepunk.work.geolocation.data.WeatherRepository;
 import homepunk.work.geolocation.model.Weather;
 import homepunk.work.geolocation.presenters.interfaces.IWeatherViewPresenter;
 import homepunk.work.geolocation.ui.interfaces.IWeatherView;
@@ -13,11 +14,15 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class WeatherViewPresenter implements IWeatherViewPresenter {
-    private final MetaWeatherRepository weatherRepository;
+    public static final float DEFAULT_ZOOM = 14.0f;
+    private final WeatherRepository weatherRepository;
     private IWeatherView view;
+    private LatLng initLatLng;
+    private LatLng targetLatLng;
+    private GoogleMap map;
 
     public WeatherViewPresenter() {
-        this.weatherRepository = new MetaWeatherRepository();
+        this.weatherRepository = new WeatherRepository();
     }
 
     @Override
@@ -26,11 +31,10 @@ public class WeatherViewPresenter implements IWeatherViewPresenter {
     }
 
     @Override
-    public void getWeatherByLocation(Location location) {
-        Latlng latlng = new Latlng(location.getLatitude(), location.getLongitude());
+    public void getWeatherByLocation(LatLng latLng) {
+        this.initLatLng = latLng;
 
-        Log.d("PRESENTER", String.valueOf(latlng));
-        weatherRepository.getCurrentWeatherByLatlng(latlng)
+        weatherRepository.getCurrentWeatherByLatlng(latLng)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Weather>() {
@@ -55,4 +59,24 @@ public class WeatherViewPresenter implements IWeatherViewPresenter {
                 });
     }
 
+    @Override
+    public void setMap(GoogleMap map) {
+        this.map = map;
+
+        setUpMap();
+        moveOnMap(initLatLng);
+    }
+
+    private void setUpMap(){
+        if (map != null) {
+            map.setOnCameraIdleListener(() -> targetLatLng = map.getCameraPosition().target);
+        }
+    }
+
+    private void moveOnMap(LatLng destination) {
+        if (initLatLng != null) {
+            map.addMarker(new MarkerOptions().position(destination).title("Marker in Kharkiv"));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(destination, DEFAULT_ZOOM));
+        }
+    }
 }

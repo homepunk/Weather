@@ -1,6 +1,9 @@
 package homepunk.work.geolocation.data;
 
 public class Constants {
+    //    Api keys
+    public static final String GOOGLE_API_KEY = "AIzaSyCL4mqIJr3I57UYjyuvcwKzcab5qwvQzXE";
+
     //    Api urls
     public static final String BASE_URL = "https://www.metaweather.com";
     public static final String LOCATION_URL = "/api/location/search/";

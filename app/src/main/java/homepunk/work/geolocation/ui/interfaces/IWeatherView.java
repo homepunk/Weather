@@ -5,6 +5,4 @@ import homepunk.work.geolocation.model.Weather;
 public interface IWeatherView {
     void onResult(Weather weather);
     void onError(String e);
-    void showLoading();
-    void hideLoading();
 }

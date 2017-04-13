@@ -129,7 +129,6 @@ public class Weather {
                      .append(consolidatedWeather.getWeatherStateAbbr())
                      .append(WEATHER_ICON_PNG_TYPE);
 
-        Log.d("PAAAAATH", stringBuilder.toString());
         return stringBuilder.toString();
     }
 
