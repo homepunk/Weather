@@ -1,4 +1,4 @@
-package homepunk.work.geolocation.model;
+package homepunk.work.geolocation.presentation.model;
 
 
 import com.google.gson.annotations.SerializedName;

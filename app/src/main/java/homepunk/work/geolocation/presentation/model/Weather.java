@@ -1,6 +1,4 @@
-package homepunk.work.geolocation.model;
-
-import android.util.Log;
+package homepunk.work.geolocation.presentation.model;
 
 import com.google.gson.annotations.SerializedName;
 

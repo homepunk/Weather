@@ -1,10 +1,13 @@
-package homepunk.work.geolocation.data;
+package homepunk.work.geolocation.data.repository;
 
+
+import android.widget.PopupWindow;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import homepunk.work.geolocation.data.api.WeatherApi;
 import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
-import homepunk.work.geolocation.model.Weather;
+import homepunk.work.geolocation.presentation.model.Weather;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -13,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Single;
 
 import static homepunk.work.geolocation.data.Constants.BASE_URL;
+import static homepunk.work.geolocation.presentation.utils.LocationUtils.format;
 
 public class WeatherRepository implements IMetaWeatherModel {
     private final WeatherApi weatherApi;
@@ -22,12 +26,11 @@ public class WeatherRepository implements IMetaWeatherModel {
     }
 
     @Override
-    public Single<Weather> getCurrentWeatherByLatlng(LatLng latlng) {
-        String formattedLatlng = String.format("%.2f,%.2f", latlng.latitude, latlng.longitude);
-
-        return weatherApi.fetchLocation(formattedLatlng)
-                         .flatMap(weatherLoc ->
-                                 weatherApi.fetchWeatherByWoeid((int) weatherLoc.get(0).getWoeid()));
+    public Single<Weather> getCurrentWeatherByLatLng(LatLng latlng) {
+        return weatherApi
+                .fetchLocation(format(latlng))
+                .flatMap(weatherLoc -> weatherApi
+                        .fetchWeatherByWoeid((int) weatherLoc.get(0).getWoeid()));
     }
 
 
@@ -38,7 +41,7 @@ public class WeatherRepository implements IMetaWeatherModel {
         OkHttpClient client = new OkHttpClient
                 .Builder()
                 .retryOnConnectionFailure(false)
-//                .addInterceptor(interceptor)
+                .addInterceptor(interceptor)
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()

@@ -1,4 +1,4 @@
-package homepunk.work.geolocation;
+package homepunk.work.geolocation.presentation;
 
 import android.app.Application;
 

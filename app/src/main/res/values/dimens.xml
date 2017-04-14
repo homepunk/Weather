@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="ICON_DEFAULT_SIZE">24dp</dimen>
+    <dimen name="weather_info_size">48dp</dimen>
 </resources>
