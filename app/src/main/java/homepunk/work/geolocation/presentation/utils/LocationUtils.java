@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -23,7 +24,8 @@ public class LocationUtils {
     public static void setMarkerOnMap(GoogleMap map, MarkerOptions markerOptions) {
         if (map != null && markerOptions != null) {
             map.clear();
-            map.addMarker(markerOptions);
+            map.addMarker(markerOptions)
+                    .showInfoWindow();
         }
     }
 
@@ -57,8 +59,8 @@ public class LocationUtils {
         return adress;
     }
 
-    public static String format(LatLng latLng){
-        return String.format("%.2f,%.2f", latLng.latitude, latLng.longitude);
+    public static String convertToString(LatLng latLng) {
+        return String.format(Locale.ROOT, "%.2f,%.2f", latLng.latitude, latLng.longitude);
     }
 
     private static void initGeocoder(Context context) {

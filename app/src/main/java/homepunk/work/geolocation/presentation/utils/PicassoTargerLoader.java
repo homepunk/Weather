@@ -7,6 +7,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import rx.SingleSubscriber;
+import timber.log.Timber;
 
 /**
  * Created by Homepunk on 14.04.2017.
@@ -21,12 +22,13 @@ public class PicassoTargerLoader implements Target {
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        Timber.i("Success: " + bitmap.toString());
         singleSubscriber.onSuccess(bitmap);
     }
 
     @Override
     public void onBitmapFailed(Drawable errorDrawable) {
-
+        Timber.i("Failed laoding bitmap");
     }
 
     @Override

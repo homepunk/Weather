@@ -1,6 +1,5 @@
 package homepunk.work.geolocation.presentation.utils;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.squareup.picasso.Picasso;
@@ -8,14 +7,10 @@ import com.squareup.picasso.Picasso;
 import homepunk.work.geolocation.presentation.utils.interfaces.IBitmapLoader;
 import rx.Single;
 import rx.SingleSubscriber;
+import timber.log.Timber;
 
 public class BitmapLoader implements IBitmapLoader {
-    private Context context;
     private Picasso picasso;
-
-    public BitmapLoader(Context context) {
-        this.context = context;
-    }
 
     @Override
     public Single<Bitmap> getBitmap(String url) {
@@ -24,6 +19,7 @@ public class BitmapLoader implements IBitmapLoader {
 
     private void loadImage(SingleSubscriber<? super Bitmap> singleSubscriber, String url) {
         if (picasso != null) {
+            Timber.i("Url: " + url);
             picasso.load(url).into(new PicassoTargerLoader(singleSubscriber));
         }
     }

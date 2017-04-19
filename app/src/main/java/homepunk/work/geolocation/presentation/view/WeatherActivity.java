@@ -84,28 +84,30 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
         GoogleMap map = googleMap;
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        popupLayout = inflater.inflate(R.layout.item_popup, (ViewGroup) findViewById(R.id.popup));
 
         map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
                 WeatherActivity.this.marker = marker;
 
-                ivPopupIcon = (ImageView) popupLayout.findViewById(R.id.popup_weather_icon);
-                tvPopupInfo = (TextView) popupLayout.findViewById(R.id.popup_weather_textview);
 
-                return popupLayout;
+                return null;
             }
 
             @Override
             public View getInfoContents(Marker marker) {
+                View popupLayout = getLayoutInflater().inflate(R.layout.item_popup, (ViewGroup) findViewById(R.id.popup));
 
-                if (WeatherActivity.this.marker != null && WeatherActivity.this.marker.isInfoWindowShown()) {
-                    WeatherActivity.this.marker.hideInfoWindow();
-                    WeatherActivity.this.marker.showInfoWindow();
-                }
+                ivPopupIcon = (ImageView) popupLayout.findViewById(R.id.popup_weather_icon);
+                tvPopupInfo = (TextView) popupLayout.findViewById(R.id.popup_weather_textview);
 
-                return null;
+                tvPopupInfo.setText(marker.getTitle());
+
+                Picasso.with(WeatherActivity.this)
+                        .load(marker.getSnippet())
+                        .into(ivPopupIcon);
+
+                return popupLayout;
             }
         });
 
@@ -181,18 +183,19 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
                 .location(new LocationManagerProvider());
 
         rxPermissions = new RxPermissions(this);
-
-        bitmapLoader = new BitmapLoader(this);
-        bitmapLoader.setPicassoInstance(Picasso.with(this));
     }
 
     private void locate() {
         checkPermissions();
 
-        locationControl.start(location1 -> WeatherActivity.this.location = location1);
+        locationControl.start((Location location1) -> {
+            WeatherActivity.this.location = location1;
+            Timber.i("Location from start method: " + location1.getLatitude() + " " + location1.getLongitude());
+        });
 
         if (location == null) {
             location = locationControl.getLastLocation();
+            Timber.i("Last location: " + location.getLatitude() + " " + location.getLongitude());
         }
 
         if (location != null) {

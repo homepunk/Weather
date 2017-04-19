@@ -1,8 +1,6 @@
 package homepunk.work.geolocation.data.repository;
 
 
-import android.widget.PopupWindow;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import homepunk.work.geolocation.data.api.WeatherApi;
@@ -16,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Single;
 
 import static homepunk.work.geolocation.data.Constants.BASE_URL;
-import static homepunk.work.geolocation.presentation.utils.LocationUtils.format;
+import static homepunk.work.geolocation.presentation.utils.LocationUtils.convertToString;
 
 public class WeatherRepository implements IMetaWeatherModel {
     private final WeatherApi weatherApi;
@@ -28,9 +26,11 @@ public class WeatherRepository implements IMetaWeatherModel {
     @Override
     public Single<Weather> getCurrentWeatherByLatLng(LatLng latlng) {
         return weatherApi
-                .fetchLocation(format(latlng))
-                .flatMap(weatherLoc -> weatherApi
-                        .fetchWeatherByWoeid((int) weatherLoc.get(0).getWoeid()));
+                .fetchLocation(convertToString(latlng))
+                .map(weatherLocations ->
+                        weatherLocations.get(0))
+                .flatMap(weatherLocation ->
+                        weatherApi.fetchWeatherByWoeid((int) weatherLocation.getWoeid()));
     }
 
 
