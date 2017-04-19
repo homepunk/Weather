@@ -4,12 +4,10 @@ import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import javax.inject.Inject;
-
 import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
-import homepunk.work.geolocation.presentation.App;
+import homepunk.work.geolocation.data.repository.WeatherRepository;
 import homepunk.work.geolocation.presentation.models.Coordinate;
-import homepunk.work.geolocation.presentation.models.Weather;
+import homepunk.work.geolocation.presentation.models.TotalWeather;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IWeatherViewPresenter;
 import homepunk.work.geolocation.presentation.views.interfaces.IWeatherView;
 import rx.SingleSubscriber;
@@ -17,14 +15,13 @@ import rx.SingleSubscriber;
 import static homepunk.work.geolocation.presentation.utils.RxUtils.applySchedulers;
 
 public class WeatherPresenter implements IWeatherViewPresenter {
-    @Inject IMetaWeatherModel repository;
+    private IMetaWeatherModel repository;
 
     private IWeatherView view;
     private LatLng zeroLatLng;
 
-
     public WeatherPresenter(Context context) {
-        App.getAppComponent(context).plus(this);
+        this.repository = new WeatherRepository();
         this.zeroLatLng = new LatLng(0, 0);
     }
 
@@ -41,9 +38,9 @@ public class WeatherPresenter implements IWeatherViewPresenter {
 
         repository.getCurrentWeather(coordinate)
                 .compose(applySchedulers())
-                .subscribe(new SingleSubscriber<Weather>() {
+                .subscribe(new SingleSubscriber<TotalWeather>() {
                     @Override
-                    public void onSuccess(Weather weather) {
+                    public void onSuccess(TotalWeather weather) {
                         if (view != null) {
                             view.onResult(weather);
                         }

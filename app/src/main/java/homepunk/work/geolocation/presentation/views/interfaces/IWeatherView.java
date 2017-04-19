@@ -1,10 +1,8 @@
 package homepunk.work.geolocation.presentation.views.interfaces;
 
-import com.google.android.gms.maps.model.Marker;
-
-import homepunk.work.geolocation.presentation.models.Weather;
+import homepunk.work.geolocation.presentation.models.TotalWeather;
 
 public interface IWeatherView {
-    void onResult(Weather weather);
+    void onResult(TotalWeather weather);
     void onError(String e);
 }

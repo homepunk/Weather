@@ -1,21 +1,21 @@
 package homepunk.work.geolocation.data;
 
 public class Constants {
-    //    Api keys
+    //    ApiManager keys
     public static final String GOOGLE_API_KEY = "AIzaSyCL4mqIJr3I57UYjyuvcwKzcab5qwvQzXE";
 
-    //    Api urls
+    //    ApiManager urls
     public static final String BASE_URL = "https://www.metaweather.com";
     public static final String LOCATION_URL = "/api/location/search/";
     public static final String WEATHER_URL = "/api/location/{woeid}/";
-    //    Api params
+    //    ApiManager params
     public static final String LATLONG_PARAM = "lattlong";
     public static final String WOEID_PARAM = "woeid";
 
     public static final String WEATHER_ICON_URL = "/static/img/weather/png/";
     public static final String WEATHER_ICON_PNG_TYPE = ".png";
 
-    //    WeatherLocation
+    //    LocationInformation
     public static final String LOCATION_TITLE = "title";
     public static final String LOCATION_LATLNG = "latt_long";
     public static final String LOCATION_LOC_TYPE = "location_type";

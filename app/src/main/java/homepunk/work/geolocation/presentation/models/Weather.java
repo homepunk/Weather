@@ -1,137 +1,150 @@
 package homepunk.work.geolocation.presentation.models;
 
+
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
-import static homepunk.work.geolocation.data.Constants.BASE_URL;
-import static homepunk.work.geolocation.data.Constants.WEATHER_ICON_PNG_TYPE;
-import static homepunk.work.geolocation.data.Constants.WEATHER_ICON_URL;
-
 public class Weather {
-    @SerializedName("consolidated_weather")
-    private List<WeatherConsolidated> consolidatedWeather = null;
+    @SerializedName("weather_state_name")
+    private String weatherStateName;
 
-    @SerializedName("time")
-    private String time;
+    @SerializedName("weather_state_abbr")
+    private String weatherStateAbbr;
 
-    @SerializedName("sun_rise")
-    private String sunRise;
+    @SerializedName("wind_direction_compass")
+    private String windDirectionCompass;
 
-    @SerializedName("sun_set")
-    private String sunSet;
+    @SerializedName("created")
+    private String created;
 
-    @SerializedName("timezone_name")
-    private String timezoneName;
+    @SerializedName("applicable_date")
+    private String applicableDate;
 
-    @SerializedName("title")
-    private String title;
+    @SerializedName("min_temp")
+    private double minTemp;
 
-    @SerializedName("location_type")
-    private String locationType;
+    @SerializedName("max_temp")
+    private double maxTemp;
 
-    @SerializedName("woeid")
-    private int woeid;
+    @SerializedName("the_temp")
+    private double theTemp;
 
-    @SerializedName("latt_long")
-    private String lattLong;
+    @SerializedName("wind_speed")
+    private double windSpeed;
 
-    @SerializedName("timezone")
-    private String timezone;
+    @SerializedName("wind_direction")
+    private double windDirection;
 
-    public List<WeatherConsolidated> getConsolidatedWeather() {
-        return consolidatedWeather;
+    @SerializedName("air_pressure")
+    private double airPressure;
+
+    @SerializedName("humidity")
+    private int humidity;
+
+    @SerializedName("predictability")
+    private int predictability;
+
+
+    public String getWeatherStateName() {
+        return weatherStateName;
     }
 
-    public void setConsolidatedWeather(List<WeatherConsolidated> consolidatedWeather) {
-        this.consolidatedWeather = consolidatedWeather;
+    public void setWeatherStateName(String weatherStateName) {
+        this.weatherStateName = weatherStateName;
     }
 
-    public String getTime() {
-        return time;
+    public String getWeatherStateAbbr() {
+        return weatherStateAbbr;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setWeatherStateAbbr(String weatherStateAbbr) {
+        this.weatherStateAbbr = weatherStateAbbr;
     }
 
-    public String getSunRise() {
-        return sunRise;
+    public String getWindDirectionCompass() {
+        return windDirectionCompass;
     }
 
-    public void setSunRise(String sunRise) {
-        this.sunRise = sunRise;
+    public void setWindDirectionCompass(String windDirectionCompass) {
+        this.windDirectionCompass = windDirectionCompass;
     }
 
-    public String getSunSet() {
-        return sunSet;
+    public String getCreated() {
+        return created;
     }
 
-    public void setSunSet(String sunSet) {
-        this.sunSet = sunSet;
+    public void setCreated(String created) {
+        this.created = created;
     }
 
-    public String getTimezoneName() {
-        return timezoneName;
+    public String getApplicableDate() {
+        return applicableDate.substring(5, 10);
     }
 
-    public void setTimezoneName(String timezoneName) {
-        this.timezoneName = timezoneName;
+    public void setApplicableDate(String applicableDate) {
+        this.applicableDate = applicableDate;
     }
 
-    public String getTitle() {
-        return title;
+    public double getMinTemp() {
+        return minTemp;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setMinTemp(double minTemp) {
+        this.minTemp = minTemp;
     }
 
-    public String getLocationType() {
-        return locationType;
+    public double getMaxTemp() {
+        return maxTemp;
     }
 
-    public void setLocationType(String locationType) {
-        this.locationType = locationType;
+    public void setMaxTemp(double maxTemp) {
+        this.maxTemp = maxTemp;
     }
 
-    public int getWoeid() {
-        return woeid;
+    public double getTheTemp() {
+        return theTemp;
     }
 
-    public void setWoeid(int woeid) {
-        this.woeid = woeid;
+    public void setTheTemp(double theTemp) {
+        this.theTemp = theTemp;
     }
 
-    public String getLattLong() {
-        return lattLong;
+    public double getWindSpeed() {
+        return windSpeed;
     }
 
-    public void setLattLong(String lattLong) {
-        this.lattLong = lattLong;
+    public void setWindSpeed(double windSpeed) {
+        this.windSpeed = windSpeed;
     }
 
-    public String getTimezone() {
-        return timezone;
+    public double getWindDirection() {
+        return windDirection;
     }
 
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
+    public void setWindDirection(double windDirection) {
+        this.windDirection = windDirection;
     }
 
-    public String getFullWeatherIconPath(){
-        WeatherConsolidated consolidatedWeather = getConsolidatedWeather().get(0);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(BASE_URL)
-                     .append(WEATHER_ICON_URL)
-                     .append(consolidatedWeather.getWeatherStateAbbr())
-                     .append(WEATHER_ICON_PNG_TYPE);
-
-        return stringBuilder.toString();
+    public double getAirPressure() {
+        return airPressure;
     }
 
-    public WeatherConsolidated getFirstConsolidatedWeather() {
-        return consolidatedWeather == null || consolidatedWeather.size() == 0 ? null : consolidatedWeather.get(0);
+    public void setAirPressure(double airPressure) {
+        this.airPressure = airPressure;
     }
 
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(int humidity) {
+        this.humidity = humidity;
+    }
+
+    public int getPredictability() {
+        return predictability;
+    }
+
+    public void setPredictability(int predictability) {
+        this.predictability = predictability;
+    }
 }

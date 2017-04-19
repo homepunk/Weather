@@ -14,17 +14,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.squareup.picasso.Picasso;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import homepunk.work.geolocation.R;
-import homepunk.work.geolocation.presentation.App;
 import homepunk.work.geolocation.presentation.adapters.CustomInfoWindowAdapter;
 import homepunk.work.geolocation.presentation.models.Coordinate;
+import homepunk.work.geolocation.presentation.models.TotalWeather;
 import homepunk.work.geolocation.presentation.models.Weather;
-import homepunk.work.geolocation.presentation.models.WeatherConsolidated;
+import homepunk.work.geolocation.presentation.presenters.MapPresenter;
+import homepunk.work.geolocation.presentation.presenters.WeatherPresenter;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IMapPresenter;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IWeatherViewPresenter;
 import homepunk.work.geolocation.presentation.views.interfaces.IWeatherView;
@@ -41,13 +40,11 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     @Bind(R.id.lattlng_weather_textview) TextView latLngWeatherTV;
     @Bind(R.id.lattlng_weather_icon) ImageView latLngWeatherIconIV;
 
-    @Inject IMapPresenter mapPresenter;
-    @Inject IWeatherViewPresenter weatherPresenter;
-
-    private Location location;
+    private Coordinate coordinate;
+    private IMapPresenter mapPresenter;
     private SupportMapFragment mapFragment;
     private LocationControl locationControl;
-    private WeatherConsolidated weatherConsolidated;
+    private IWeatherViewPresenter weatherPresenter;
     private CustomInfoWindowAdapter customInfoWindowAdapter;
 
 
@@ -55,8 +52,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
-
-        App.getAppComponent(this).plus(this);
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
@@ -89,19 +84,19 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     }
 
     @Override
-    public void onResult(Weather weather) {
-        weatherConsolidated = weather.getFirstConsolidatedWeather();
+    public void onResult(TotalWeather totalWeather) {
+        Weather weather = totalWeather.getFirstConsolidatedWeather();
 
-        if (weather != null && weatherConsolidated!= null) {
+        if (weather != null) {
                 StringBuilder sb = new StringBuilder()
-                        .append(weatherConsolidated.getWeatherStateName())
+                        .append(weather.getWeatherStateName())
                         .append(" in ")
-                        .append(weather.getTitle());
+                        .append(totalWeather.getTitle());
 
                 latLngWeatherTV.setText(sb.toString());
 
                 Picasso.with(this)
-                        .load(weather.getFullWeatherIconPath())
+                        .load(totalWeather.getFullWeatherIconPath())
                         .into(latLngWeatherIconIV);
         }
     }
@@ -118,8 +113,7 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     }
 
     private void setUpUI() {
-        weatherPresenter.setView(this);
-
+        mapPresenter = new MapPresenter(this);
         mapPresenter.setView(this);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
@@ -130,6 +124,9 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
                 .build()
                 .location(new LocationManagerProvider());
 
+        weatherPresenter = new WeatherPresenter(this);
+        weatherPresenter.setView(this);
+
         customInfoWindowAdapter = new CustomInfoWindowAdapter(this);
 
     }
@@ -137,16 +134,22 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     private void locate() {
         verifyPermissionsGranted(this);
 
-        locationControl.start((Location location1) -> {
-            WeatherActivity.this.location = location1;
-        });
+        locationControl.start(this::setCoordinate);
 
-        if (location == null) {
-            location = locationControl.getLastLocation();
+        if (coordinate == null) {
+            setCoordinate(locationControl.getLastLocation());
         }
 
-        if (location != null) {
-            weatherPresenter.getCurrentWeather(new Coordinate(location));
+        if (coordinate != null) {
+            weatherPresenter.getCurrentWeather(coordinate);
        }
+    }
+
+    private void setCoordinate(Location location) {
+        if (location == null){
+            return;
+        }
+
+        coordinate = new Coordinate(location);
     }
 }

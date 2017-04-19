@@ -5,7 +5,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import homepunk.work.geolocation.presentation.models.Coordinate;
-import homepunk.work.geolocation.presentation.models.Weather;
+import homepunk.work.geolocation.presentation.models.TotalWeather;
 
 public class MapUtils {
     public static final float DEFAULT_ZOOM = 6.0f;
@@ -20,7 +20,7 @@ public class MapUtils {
         }
     }
 
-    public static MarkerOptions getMarkerOptions(Weather weather, Coordinate coordinate) {
+    public static MarkerOptions getMarkerOptions(TotalWeather weather, Coordinate coordinate) {
         return new MarkerOptions()
                 .position(coordinate.getMapLatLng())
                 .snippet(weather.getFullWeatherIconPath())

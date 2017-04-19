@@ -9,7 +9,7 @@ import static homepunk.work.geolocation.data.Constants.LOCATION_LOC_TYPE;
 import static homepunk.work.geolocation.data.Constants.LOCATION_TITLE;
 import static homepunk.work.geolocation.data.Constants.LOCATION_WOEID;
 
-public class WeatherLocation {
+public class LocationInformation {
     @SerializedName(LOCATION_TITLE)
     private String title;
 

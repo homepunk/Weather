@@ -5,10 +5,8 @@ import android.content.Context;
 import com.google.android.gms.maps.GoogleMap;
 import com.squareup.picasso.Picasso;
 
-import javax.inject.Inject;
-
 import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
-import homepunk.work.geolocation.presentation.App;
+import homepunk.work.geolocation.data.repository.WeatherRepository;
 import homepunk.work.geolocation.presentation.models.Coordinate;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IMapPresenter;
 import homepunk.work.geolocation.presentation.utils.loaders.BitmapLoader;
@@ -25,14 +23,14 @@ import static homepunk.work.geolocation.presentation.utils.RxUtils.applySchedule
  */
 
 public class MapPresenter implements IMapPresenter {
-    @Inject IMetaWeatherModel repository;
+    private IMetaWeatherModel repository;
 
     private GoogleMap map;
     private IWeatherView view;
     private BitmapLoader bitmapLoader;
 
     public MapPresenter(Context context) {
-        App.getAppComponent(context).plus(this);
+        this.repository = new WeatherRepository();
         this.bitmapLoader = new BitmapLoader();
         this.bitmapLoader.setPicassoInstance(Picasso.with(context));
     }
