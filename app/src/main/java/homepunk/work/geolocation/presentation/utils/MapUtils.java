@@ -20,7 +20,9 @@ public class MapUtils {
         }
     }
 
-    public static MarkerOptions getMarkerOptions(TotalWeather weather, Coordinate coordinate) {
+    public static MarkerOptions getUpdatedMarkerOptions(TotalWeather weather) {
+        Coordinate coordinate = new Coordinate(weather.getLattLong());
+
         return new MarkerOptions()
                 .position(coordinate.getMapLatLng())
                 .snippet(weather.getFullWeatherIconPath())
@@ -31,8 +33,7 @@ public class MapUtils {
     public static void setMarkerOnMap(GoogleMap map, MarkerOptions markerOptions) {
         if (map != null && markerOptions != null) {
             map.clear();
-            map.addMarker(markerOptions)
-                    .showInfoWindow();
+            map.addMarker(markerOptions).showInfoWindow();
         }
     }
 

@@ -1,9 +1,9 @@
 package homepunk.work.geolocation.data.repository;
 
 
-import homepunk.work.geolocation.data.api.ApiManager;
+import homepunk.work.geolocation.data.api.WeatherApiManager;
 import homepunk.work.geolocation.data.api.WeatherApi;
-import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
+import homepunk.work.geolocation.data.repository.interfaces.IMetaWeatherModel;
 import homepunk.work.geolocation.presentation.models.Coordinate;
 import homepunk.work.geolocation.presentation.models.TotalWeather;
 import homepunk.work.geolocation.presentation.models.LocationInformation;
@@ -14,7 +14,7 @@ public class WeatherRepository implements IMetaWeatherModel {
     private WeatherApi weatherApi;
 
     public WeatherRepository() {
-        this.weatherApi = ApiManager.getInstance();
+        this.weatherApi = WeatherApiManager.getInstance();
     }
 
     @Override

@@ -1,14 +1,14 @@
 package homepunk.work.geolocation.data;
 
 public class Constants {
-    //    ApiManager keys
+    //    WeatherApiManager keys
     public static final String GOOGLE_API_KEY = "AIzaSyCL4mqIJr3I57UYjyuvcwKzcab5qwvQzXE";
 
-    //    ApiManager urls
+    //    WeatherApiManager urls
     public static final String BASE_URL = "https://www.metaweather.com";
     public static final String LOCATION_URL = "/api/location/search/";
     public static final String WEATHER_URL = "/api/location/{woeid}/";
-    //    ApiManager params
+    //    WeatherApiManager params
     public static final String LATLONG_PARAM = "lattlong";
     public static final String WOEID_PARAM = "woeid";
 

@@ -2,6 +2,8 @@ package homepunk.work.geolocation.presentation.models;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Locale;
 
 /**
@@ -19,12 +21,7 @@ public class Coordinate {
         this.longitude = 0.0;
     }
 
-    public Coordinate(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public Coordinate(com.google.android.gms.maps.model.LatLng latLng) {
+    public Coordinate(LatLng latLng) {
         this.latitude = latLng.latitude;
         this.longitude = latLng.longitude;
     }
@@ -63,8 +60,12 @@ public class Coordinate {
         this.latitude = latitude;
     }
 
-    public com.google.android.gms.maps.model.LatLng getMapLatLng(){
-        return new com.google.android.gms.maps.model.LatLng(latitude, longitude);
+    public LatLng getMapLatLng(){
+        return new LatLng(latitude, longitude);
+    }
+
+    public boolean isEmpty() {
+        return latitude == 0 && longitude == 0;
     }
 
     @Override

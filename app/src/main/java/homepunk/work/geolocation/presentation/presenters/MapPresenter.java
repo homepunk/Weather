@@ -5,15 +5,15 @@ import android.content.Context;
 import com.google.android.gms.maps.GoogleMap;
 import com.squareup.picasso.Picasso;
 
-import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
+import homepunk.work.geolocation.data.repository.interfaces.IMetaWeatherModel;
 import homepunk.work.geolocation.data.repository.WeatherRepository;
 import homepunk.work.geolocation.presentation.models.Coordinate;
+import homepunk.work.geolocation.presentation.models.TotalWeather;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IMapPresenter;
 import homepunk.work.geolocation.presentation.utils.loaders.BitmapLoader;
 import homepunk.work.geolocation.presentation.views.interfaces.IWeatherView;
-import timber.log.Timber;
 
-import static homepunk.work.geolocation.presentation.utils.MapUtils.getMarkerOptions;
+import static homepunk.work.geolocation.presentation.utils.MapUtils.getUpdatedMarkerOptions;
 import static homepunk.work.geolocation.presentation.utils.MapUtils.moveCameraToLatLng;
 import static homepunk.work.geolocation.presentation.utils.MapUtils.setMarkerOnMap;
 import static homepunk.work.geolocation.presentation.utils.RxUtils.applySchedulers;
@@ -23,16 +23,15 @@ import static homepunk.work.geolocation.presentation.utils.RxUtils.applySchedule
  */
 
 public class MapPresenter implements IMapPresenter {
-    private IMetaWeatherModel repository;
-
     private GoogleMap map;
     private IWeatherView view;
     private BitmapLoader bitmapLoader;
+    private IMetaWeatherModel repository;
 
     public MapPresenter(Context context) {
-        this.repository = new WeatherRepository();
         this.bitmapLoader = new BitmapLoader();
         this.bitmapLoader.setPicassoInstance(Picasso.with(context));
+        this.repository = new WeatherRepository();
     }
 
 
@@ -48,20 +47,20 @@ public class MapPresenter implements IMapPresenter {
 
     @Override
     public void onMapClick(Coordinate coordinate) {
-        if (map != null) {
-            moveCameraToLatLng(map, coordinate);
-
-            repository.getCurrentWeather(coordinate)
-                    .compose(applySchedulers())
-                    .subscribe(weather -> {
-                        Timber.i("Recived " + weather.getTitle() + " with " + weather.getLattLong());
-                        if (view != null) {
-                            bitmapLoader.getBitmap(weather.getFullWeatherIconPath())
-                                    .subscribe(bitmap ->
-                                            setMarkerOnMap(map, getMarkerOptions(weather, coordinate)));
-                        }
-                    });
+        if (map == null || view == null) {
+            return;
         }
+
+        moveCameraToLatLng(map, coordinate);
+
+        repository.getCurrentWeather(coordinate)
+                  .compose(applySchedulers())
+                  .subscribe(MapPresenter.this::loadBitmap);
+    }
+
+    private void loadBitmap(TotalWeather weather) {
+        bitmapLoader.getBitmap(weather.getFullWeatherIconPath())
+                    .subscribe(bitmap -> setMarkerOnMap(map, getUpdatedMarkerOptions(weather)));
     }
 
 }

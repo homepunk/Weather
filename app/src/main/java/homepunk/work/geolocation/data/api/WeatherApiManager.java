@@ -8,11 +8,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static homepunk.work.geolocation.data.Constants.BASE_URL;
 
-public class ApiManager {
+public class WeatherApiManager {
     private static WeatherApi weatherApi;
     private static OkHttpClient client;
 
-    private ApiManager() {
+    private WeatherApiManager() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -25,7 +25,7 @@ public class ApiManager {
 
     public static WeatherApi getInstance() {
         if (weatherApi == null) {
-            new ApiManager();
+            new WeatherApiManager();
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)

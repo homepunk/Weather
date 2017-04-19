@@ -13,15 +13,12 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import homepunk.work.geolocation.R;
-import timber.log.Timber;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-    @Bind(R.id.popup_weather_icon)
-    ImageView popUpWeatherIcon;
-    @Bind(R.id.popup_weather_textview)
-    TextView popUpWeatherInfo;
+    @Bind(R.id.popup_weather_icon) ImageView popUpWeatherIcon;
+    @Bind(R.id.popup_weather_textview) TextView popUpWeatherInfo;
 
     private View view;
     private Picasso picasso;
@@ -38,7 +35,6 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
-        Timber.i("Inflating " + marker.getTitle());
         popUpWeatherIcon = (ImageView) view.findViewById(R.id.popup_weather_icon);
         popUpWeatherInfo = (TextView) view.findViewById(R.id.popup_weather_textview);
 

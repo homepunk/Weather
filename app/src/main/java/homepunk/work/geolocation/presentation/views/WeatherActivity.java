@@ -35,10 +35,14 @@ import static io.nlopez.smartlocation.SmartLocation.Builder;
 import static io.nlopez.smartlocation.SmartLocation.LocationControl;
 
 public class WeatherActivity extends AppCompatActivity implements IWeatherView, OnMapReadyCallback {
-    @Bind(R.id.toolbar) Toolbar toolbar;
-    @Bind(R.id.fab) FloatingActionButton fab;
-    @Bind(R.id.lattlng_weather_textview) TextView latLngWeatherTV;
-    @Bind(R.id.lattlng_weather_icon) ImageView latLngWeatherIconIV;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+    @Bind(R.id.lattlng_weather_textview)
+    TextView latLngWeatherTV;
+    @Bind(R.id.lattlng_weather_icon)
+    ImageView latLngWeatherIconIV;
 
     private Coordinate coordinate;
     private IMapPresenter mapPresenter;
@@ -54,8 +58,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-
         setUpUI();
     }
 
@@ -66,7 +68,6 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
 
         locate();
     }
-
 
 
     @Override
@@ -87,18 +88,21 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     public void onResult(TotalWeather totalWeather) {
         Weather weather = totalWeather.getFirstConsolidatedWeather();
 
-        if (weather != null) {
-                StringBuilder sb = new StringBuilder()
-                        .append(weather.getWeatherStateName())
-                        .append(" in ")
-                        .append(totalWeather.getTitle());
-
-                latLngWeatherTV.setText(sb.toString());
-
-                Picasso.with(this)
-                        .load(totalWeather.getFullWeatherIconPath())
-                        .into(latLngWeatherIconIV);
+        if (weather == null) {
+            return;
         }
+
+        StringBuilder sb = new StringBuilder()
+                .append(weather.getWeatherStateName())
+                .append(" in ")
+                .append(totalWeather.getTitle());
+
+        latLngWeatherTV.setText(sb.toString());
+
+        Picasso.with(this)
+                .load(totalWeather.getFullWeatherIconPath())
+                .into(latLngWeatherIconIV);
+
     }
 
     @Override
@@ -113,6 +117,8 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
     }
 
     private void setUpUI() {
+        setSupportActionBar(toolbar);
+
         mapPresenter = new MapPresenter(this);
         mapPresenter.setView(this);
 
@@ -124,11 +130,10 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
                 .build()
                 .location(new LocationManagerProvider());
 
-        weatherPresenter = new WeatherPresenter(this);
+        weatherPresenter = new WeatherPresenter();
         weatherPresenter.setView(this);
 
         customInfoWindowAdapter = new CustomInfoWindowAdapter(this);
-
     }
 
     private void locate() {
@@ -142,11 +147,11 @@ public class WeatherActivity extends AppCompatActivity implements IWeatherView, 
 
         if (coordinate != null) {
             weatherPresenter.getCurrentWeather(coordinate);
-       }
+        }
     }
 
     private void setCoordinate(Location location) {
-        if (location == null){
+        if (location == null) {
             return;
         }
 
