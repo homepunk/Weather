@@ -2,33 +2,30 @@ package homepunk.work.geolocation.presentation.presenters;
 
 import android.content.Context;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.squareup.picasso.Picasso;
 
-import homepunk.work.geolocation.data.repository.WeatherRepository;
+import javax.inject.Inject;
+
+import homepunk.work.geolocation.data.interfaces.IMetaWeatherModel;
+import homepunk.work.geolocation.presentation.App;
+import homepunk.work.geolocation.presentation.models.Coordinate;
+import homepunk.work.geolocation.presentation.models.Weather;
 import homepunk.work.geolocation.presentation.presenters.interfaces.IWeatherViewPresenter;
-import homepunk.work.geolocation.presentation.utils.BitmapLoader;
-import homepunk.work.geolocation.presentation.view.interfaces.IWeatherView;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import timber.log.Timber;
+import homepunk.work.geolocation.presentation.views.interfaces.IWeatherView;
+import rx.SingleSubscriber;
 
-import static homepunk.work.geolocation.presentation.utils.LocationUtils.moveCameraToLatLng;
-import static homepunk.work.geolocation.presentation.utils.LocationUtils.setMarkerOnMap;
-import static homepunk.work.geolocation.presentation.utils.MapUtils.getCusomizedMap;
+import static homepunk.work.geolocation.presentation.utils.RxUtils.applySchedulers;
 
 public class WeatherPresenter implements IWeatherViewPresenter {
-    private final WeatherRepository repository;
+    @Inject IMetaWeatherModel repository;
+
     private IWeatherView view;
-    private GoogleMap map;
-    private BitmapLoader bitmapLoader;
+    private LatLng zeroLatLng;
+
 
     public WeatherPresenter(Context context) {
-        this.repository = new WeatherRepository();
-        this.bitmapLoader = new BitmapLoader();
-        this.bitmapLoader.setPicassoInstance(Picasso.with(context));
+        App.getAppComponent(context).plus(this);
+        this.zeroLatLng = new LatLng(0, 0);
     }
 
     @Override
@@ -37,57 +34,28 @@ public class WeatherPresenter implements IWeatherViewPresenter {
     }
 
     @Override
-    public void setMap(GoogleMap map) {
-        this.map = getCusomizedMap(map);
+    public void getCurrentWeather(Coordinate coordinate) {
+        if (coordinate.equals(zeroLatLng)) {
+            return;
+        }
 
-        setUpMapListeners();
-    }
+        repository.getCurrentWeather(coordinate)
+                .compose(applySchedulers())
+                .subscribe(new SingleSubscriber<Weather>() {
+                    @Override
+                    public void onSuccess(Weather weather) {
+                        if (view != null) {
+                            view.onResult(weather);
+                        }
+                    }
 
-    @Override
-    public void getWeatherByLatLng(LatLng latLng) {
-        Timber.i("Recieved latLng: " + latLng.toString());
-
-        repository.
-                getCurrentWeatherByLatLng(latLng)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(weather -> {
-                    if (view != null) {
-                       view.onResult(weather);
+                    @Override
+                    public void onError(Throwable error) {
+                        if (view != null) {
+                            view.onError(error.getLocalizedMessage());
+                        }
                     }
                 });
-    }
-
-    private void setUpMapListeners() {
-        if (map != null) {
-            map.setOnMapClickListener(latLng -> {
-                moveCameraToLatLng(map, latLng);
-                repository
-                        .getCurrentWeatherByLatLng(latLng)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(weather -> {
-                            if (view != null) {
-                                Timber.i("Marker recieved " + weather.getTitle());
-
-                                bitmapLoader
-                                        .getBitmap(weather.getFullWeatherIconPath())
-                                        .subscribe(bitmap -> {
-                                            setMarkerOnMap(map, new MarkerOptions()
-                                                    .position(latLng)
-                                                    .snippet(weather.getFullWeatherIconPath())
-                                                    .title(weather.getTitle()));
-                                        });
-                            }
-                        });
-            });
-
-            map.setOnMarkerClickListener(marker -> {
-                LatLng latLng = marker.getPosition();
-                Timber.i("Marker " + latLng.toString());
-               return true;
-            });
-        }
     }
 
 

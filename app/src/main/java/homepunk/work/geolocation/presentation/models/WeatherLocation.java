@@ -1,4 +1,4 @@
-package homepunk.work.geolocation.presentation.model;
+package homepunk.work.geolocation.presentation.models;
 
 
 import com.google.gson.annotations.SerializedName;
@@ -41,8 +41,8 @@ public class WeatherLocation {
         this.locationType = locationType;
     }
 
-    public long getWoeid() {
-        return woeid;
+    public int getWoeid() {
+        return (int) woeid;
     }
 
     public void setWoeid(long woeid) {

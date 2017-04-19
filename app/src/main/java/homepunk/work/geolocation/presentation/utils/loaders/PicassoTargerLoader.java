@@ -1,4 +1,4 @@
-package homepunk.work.geolocation.presentation.utils;
+package homepunk.work.geolocation.presentation.utils.loaders;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;

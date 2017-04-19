@@ -2,8 +2,8 @@ package homepunk.work.geolocation.data.api;
 
 import java.util.List;
 
-import homepunk.work.geolocation.presentation.model.WeatherLocation;
-import homepunk.work.geolocation.presentation.model.Weather;
+import homepunk.work.geolocation.presentation.models.WeatherLocation;
+import homepunk.work.geolocation.presentation.models.Weather;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;

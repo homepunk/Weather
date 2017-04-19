@@ -1,13 +1,12 @@
-package homepunk.work.geolocation.presentation.utils;
+package homepunk.work.geolocation.presentation.utils.loaders;
 
 import android.graphics.Bitmap;
 
 import com.squareup.picasso.Picasso;
 
-import homepunk.work.geolocation.presentation.utils.interfaces.IBitmapLoader;
+import homepunk.work.geolocation.presentation.utils.loaders.interfaces.IBitmapLoader;
 import rx.Single;
 import rx.SingleSubscriber;
-import timber.log.Timber;
 
 public class BitmapLoader implements IBitmapLoader {
     private Picasso picasso;
@@ -19,7 +18,6 @@ public class BitmapLoader implements IBitmapLoader {
 
     private void loadImage(SingleSubscriber<? super Bitmap> singleSubscriber, String url) {
         if (picasso != null) {
-            Timber.i("Url: " + url);
             picasso.load(url).into(new PicassoTargerLoader(singleSubscriber));
         }
     }
